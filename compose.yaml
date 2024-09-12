@@ -1,0 +1,34 @@
+services:
+    postgresdb:
+      image: postgres:latest
+      restart: unless-stopped
+      environment:
+        - POSTGRES_USER=$POSTGRESDB_USER
+        - POSTGRES_PASSWORD=$POSTGRESDB_ROOT_PASSWORD
+        - POSTGRESDB_DB=$POSTGRESDB_DATABASE
+      ports: 
+        - $POSTGRESDB_LOCAL_PORT:$POSTGRESDB_DOCKER_PORT
+      volumes:
+        - openbroadcast_videos:/var/lib/postgresql/data
+      networks:
+        - postgres_network
+    pgadmin:
+      image: dpage/pgadmin4:latest
+      environment:
+        - PGADMIN_DEFAULT_EMAIL=$PGADMIN_DEFAULT_EMAIL
+        - PGADMIN_DEFAULT_PASSWORD=$PGADMIN_DEFAULT_PASSWORD
+      depends_on:
+        - postgresdb
+      ports:
+        - 8080:80
+      volumes:
+        - openbroadcast_pgadmin:/var/lib/pgadmin
+      networks:
+        - postgres_network
+volumes:
+  openbroadcast_videos:
+  openbroadcast_pgadmin:
+networks:
+  postgres_network:
+    name: openbroadcast_postgres
+    attachable: true
